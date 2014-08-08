@@ -3,6 +3,14 @@ duplicate-directory-finder
 
 Finding duplicate files is easy. Finding directories that are duplicates is hard. And finding a fast program with parallel hashing is even harder. I wrote DuplicateDirectoryFinder to solve that problem for me and my many drives and backups.
 
+To run:
+
+You'll find the executable program in the _executable directory.
+
+To configure the location of TreeComp, open App.config in a text editor and change the path.
+
+
+Other information:
 This program is written in C#, and I used Visual Studio Express 2013 to write it.
 
 I highly recommend getting Lennert Ploeger's TreeComp (http://lploeger.home.xs4all.nl/TreeComp.htm) to quickly diff the discovered directories and quickly eliminate duplicates that way - I have also used WinMerge but it doesn't do as good of a job at displaying subdirectories.
