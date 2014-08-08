@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -57,7 +57,7 @@ namespace DuplicateDirectoryFinder
 			((Button)sender).Update();
 			useFileInfoDictionary = new Data.UseFileInfoDictionary(true);
 			this.UseWaitCursor = false;
-			(new System.Media.SoundPlayer("Ding.wav")).Play();
+			UI.PlaySound();
 		}
 
 		/* right panel: directory view button event */
@@ -85,7 +85,7 @@ namespace DuplicateDirectoryFinder
 			if (sender.GetType() == typeof(Button))
 			{
 				var senderObj = (Button)sender;
-				var paths = ((string[])senderObj.Tag);
+				var paths = (string[])senderObj.Tag;
 				if (!System.IO.Directory.Exists(paths[0])
 					|| !System.IO.Directory.Exists(paths[1]))
 				{
@@ -113,21 +113,9 @@ namespace DuplicateDirectoryFinder
 			}
 			if (checkedBoxes.Count == 2)
 			{
-				AskComparePaths((string)checkedBoxes[0].Tag, (string)checkedBoxes[1].Tag);
-			}
-		}
-
-		private void AskComparePaths(string p1, string p2)
-		{
-			if (MessageBox.Show(string.Format("Compare directories {0}\nand\n{1}?", p1, p2),
-				"Compare directories?",
-				MessageBoxButtons.YesNo)
-				== System.Windows.Forms.DialogResult.Yes)
-			{
-				string argument = string.Format("\"{0}\" \"{1}\"", p1, p2);
-
-				var treeComp = Properties.Settings.Default.TreeCompFullName;
-				if (System.IO.File.Exists(treeComp)) System.Diagnostics.Process.Start(treeComp, argument);
+				var path1 = (string)checkedBoxes[0].Tag;
+				var path2 = (string)checkedBoxes[1].Tag;
+				UI.AskComparePaths(path1, path2);
 			}
 		}
 
@@ -145,19 +133,19 @@ namespace DuplicateDirectoryFinder
 			{
 				progressScan.Style = ProgressBarStyle.Continuous;
 				loadingTimer.Stop();
-				UpdateTree();
-				(new System.Media.SoundPlayer("Ding.wav")).Play();
+				UI.UpdateTree(directoryList, treeView);
+				UI.PlaySound();
 				this.UseWaitCursor = false;
 			}
 		}
 
 		/* UI updates */
-		private System.Diagnostics.Stopwatch stopWatch;
+		private Stopwatch stopWatch;
 		private void UIUpdateTimer_Tick(object sender, EventArgs e)
 		{
 			if (stopWatch == null)
 			{
-				stopWatch = new System.Diagnostics.Stopwatch();
+				stopWatch = new Stopwatch();
 			}
 			if (!stopWatch.IsRunning)
 			{
@@ -269,8 +257,8 @@ namespace DuplicateDirectoryFinder
 			uiUpdateTimer.Stop();
 			progressScan.Value = 0;
 			buttonStartScan.Enabled = true;
-			UpdateTree();
-			(new System.Media.SoundPlayer("Ding.wav")).Play();
+			UI.UpdateTree(directoryList, treeView);
+			UI.PlaySound();
 		}
 
 		private void TreeViewDuplicates_AfterSelect(object sender, TreeViewEventArgs e)
@@ -283,19 +271,20 @@ namespace DuplicateDirectoryFinder
 			}
 		}
 
-		private void treeView_MouseUp(object sender, MouseEventArgs e)
-		{
-			if (e.Button == System.Windows.Forms.MouseButtons.Right)
-			{
-				if (MessageBox.Show(string.Format("Delete file {0}?", ""), 
-					"Delete file?", 
-					MessageBoxButtons.YesNo) 
-					== System.Windows.Forms.DialogResult.Yes)
-				{
-					// delete file
-				}
-			}
-		}
+		// todo: context menu for deleting files
+		//private void treeView_MouseUp(object sender, MouseEventArgs e)
+		//{
+		//	if (e.Button == System.Windows.Forms.MouseButtons.Right)
+		//	{
+		//		if (MessageBox.Show(string.Format("Delete file {0}?", ""), 
+		//			"Delete file?", 
+		//			MessageBoxButtons.YesNo) 
+		//			== DialogResult.Yes)
+		//		{
+		//			// delete file
+		//		}
+		//	}
+		//}
 
 		private void buttonTrimTree_Click(object sender, EventArgs e)
 		{
@@ -305,14 +294,7 @@ namespace DuplicateDirectoryFinder
 			//treeView.Nodes.AddRange(trimmedNodes);
 
 			// now trims non-duplicates
-			UpdateTree();
-		}
-
-		private void UpdateTree()
-		{
-			var rootNodes = UI.GetTreeNodes(directoryList);
-			treeView.Nodes.Clear();
-			treeView.Nodes.AddRange(rootNodes);
+			UI.UpdateTree(directoryList, treeView);
 		}
 	}
 }

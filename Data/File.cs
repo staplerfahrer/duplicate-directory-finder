@@ -3,6 +3,9 @@ using System.Security.Cryptography;
 
 namespace Data
 {
+	/// <summary>
+	/// The object containing all relevant information about a file.
+	/// </summary>
     [Serializable()]
     public class File
     {
@@ -22,6 +25,10 @@ namespace Data
 
 		public string MD5 { get; private set; }
 
+		/// <summary>
+		/// Creates the object with new FileInfo from fullName
+		/// </summary>
+		/// <param name="fullName"></param>
 		public File(string fullName)
         {
             System.IO.FileInfo fi;
@@ -38,10 +45,19 @@ namespace Data
             }
         }
 
+		/// <summary>
+		/// Creates the object with existing FileInfo
+		/// </summary>
+		/// <param name="fi"></param>
         public File(System.IO.FileInfo fi)
         {
             SetProperties(fi);
         }
+
+		public override string ToString()
+		{
+			return this.FullName;
+		}
 
 		public void Hash(UseFileInfoDictionary useFileDic)
 		{
@@ -91,11 +107,6 @@ namespace Data
                 Exception = e;
                 return null;
             }
-        }
-
-        public override string ToString()
-        {
-            return this.FullName;
         }
 	}
 }

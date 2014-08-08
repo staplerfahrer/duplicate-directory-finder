@@ -290,7 +290,6 @@
 			this.treeView.Size = new System.Drawing.Size(397, 557);
 			this.treeView.TabIndex = 0;
 			this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewDuplicates_AfterSelect);
-			this.treeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseUp);
 			// 
 			// loadingTimer
 			// 

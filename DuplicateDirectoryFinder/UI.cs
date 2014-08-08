@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -16,7 +18,7 @@ namespace DuplicateDirectoryFinder
 			var explorerControls = new List<Control>();
 
 			// duplicate file information
-			var allDuplicates = directoryList.ScanInfo.DuplicateFiles.GetDuplicatesByHash();
+			var allDuplicates = directoryList.ScanInfo.DuplicateFiles.GetDuplicatesByHash;
 			var duplicateFiles = allDuplicates.First(d => d.Key == fileHash).Value;
 
 			// for each file duplicate,
@@ -92,7 +94,7 @@ namespace DuplicateDirectoryFinder
 
 		public static TreeNode[] GetTreeNodes(Data.DirectoryList directoryList)
 		{
-			var dupFiles = directoryList.ScanInfo.DuplicateFiles.GetDuplicatesByHash()
+			var dupFiles = directoryList.ScanInfo.DuplicateFiles.GetDuplicatesByHash
 				.OrderByDescending(f => 
 					f.Value[0].Size * f.Value.Count);
 
@@ -208,5 +210,56 @@ namespace DuplicateDirectoryFinder
 
 		//	return result;
 		//}
+
+		/// <summary>
+		/// Clear tree nodes and re-create tree nodes
+		/// </summary>
+		/// <param name="directoryList"></param>
+		/// <param name="treeView"></param>
+		public static void UpdateTree(Data.DirectoryList directoryList, TreeView tree)
+		{
+			var rootNodes = GetTreeNodes(directoryList);
+			tree.Nodes.Clear();
+			tree.Nodes.AddRange(rootNodes);
+		}
+
+		/// <summary>
+		/// Ask to confirm these paths before starting the comparator
+		/// </summary>
+		/// <param name="path1"></param>
+		/// <param name="path2"></param>
+		public static void AskComparePaths(string path1, string path2)
+		{
+			if (MessageBox.Show(
+				string.Format("Compare directories\n{0}\nand\n{1}?", path1, path2),
+				"Compare directories?",
+				MessageBoxButtons.YesNo) == DialogResult.Yes)
+			{
+				ComparePaths(path1, path2);
+			}
+		}
+
+		/// <summary>
+		/// Launch the directory compare program
+		/// </summary>
+		/// <param name="path1"></param>
+		/// <param name="path2"></param>
+		public static void ComparePaths(string path1, string path2) 
+		{
+			var argument = string.Format("\"{0}\" \"{1}\"", path1, path2);
+			var treeComp = Properties.Settings.Default.TreeCompFullName;
+
+			if (File.Exists(treeComp))
+			{
+				Process.Start(treeComp, argument);
+			}
+		}
+
+		public static void PlaySound()
+		{
+			var assemblyInfo = new System.IO.FileInfo(System.Reflection.Assembly.GetAssembly(typeof(UI)).Location);
+
+			new System.Media.SoundPlayer(assemblyInfo.DirectoryName + "\\Ding.wav").Play();
+		}
 	}
 }

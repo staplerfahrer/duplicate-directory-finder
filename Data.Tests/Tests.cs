@@ -53,7 +53,7 @@ namespace Data.Tests
             var d = new Data.Directory(@".", true); 
 
             var dupStats = new Data.Statistics.DuplicateFiles(d);
-            var differentDuplicates = dupStats.GetDuplicatesByHash();
+            var differentDuplicates = dupStats.GetDuplicatesByHash;
             Assert.IsTrue(differentDuplicates.Count == 2);
 
         }
@@ -72,7 +72,7 @@ namespace Data.Tests
             var d = IO.LoadDirectory(@"SavedDirectory-Test-C-2.dat");
 
             var dupStats = new Data.Statistics.DuplicateFiles(d);
-            var differentDuplicates = dupStats.GetDuplicatesByHash();
+            var differentDuplicates = dupStats.GetDuplicatesByHash;
             
             t.Stop();
             Console.WriteLine("duplicates: " + differentDuplicates.Count);
