@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Data.Statistics
 {
@@ -84,9 +85,14 @@ namespace Data.Statistics
 			}
 		}
 
+		[Serializable()]
 		public class FilesBySize : Dictionary<long, List<File>>
 		{
 			public FilesBySize() : base()
+			{
+			}
+
+			public FilesBySize(SerializationInfo info, StreamingContext context) : base(info, context) 
 			{
 			}
 
@@ -96,9 +102,14 @@ namespace Data.Statistics
 			}
 		}
 
+		[Serializable()]
 		public class FilesByHash : Dictionary<string, List<File>>
 		{
 			public FilesByHash() : base()
+			{
+			}
+
+			public FilesByHash(SerializationInfo info, StreamingContext context) : base(info, context) 
 			{
 			}
 

@@ -124,10 +124,7 @@ namespace DuplicateDirectoryFinder
 		{
 			if (directoryList == null)
 			{
-				if (progressScan.Style != ProgressBarStyle.Marquee)
-				{
-					progressScan.Style = ProgressBarStyle.Marquee;
-				}
+				progressScan.Style = ProgressBarStyle.Marquee;
 			}
 			else
 			{
