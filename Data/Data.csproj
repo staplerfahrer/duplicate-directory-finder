@@ -50,6 +50,7 @@
     <Compile Include="Statistics\Poco\FileSizeRanges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Statistics\DuplicateFiles.cs" />
+    <Compile Include="Statistics\Poco\IOResult.cs" />
     <Compile Include="Statistics\ScanInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

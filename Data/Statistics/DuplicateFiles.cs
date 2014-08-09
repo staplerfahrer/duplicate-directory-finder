@@ -10,9 +10,9 @@ namespace Data.Statistics
 	/// </summary>
 	[Serializable()]
 	public class DuplicateFiles
-    {
+	{
 		FilesBySize allFilesBySize;
-        FilesByHash allFilesByHash;
+		FilesByHash allFilesByHash;
 		public FilesBySize AllFilesBySize { get { return allFilesBySize; } }
 		public FilesByHash AllFilesByHash { get { return allFilesByHash; } }
 
@@ -22,8 +22,8 @@ namespace Data.Statistics
 		/// <param name="dList">The object containing root directory/directories that were scanned.</param>
 		public DuplicateFiles(DirectoryList dList)
 		{
-			this.allFilesBySize = new FilesBySize(); //new Dictionary<long, List<File>>();
-			this.allFilesByHash = new FilesByHash(); //new Dictionary<string, List<File>>();
+			this.allFilesBySize = new FilesBySize();
+			this.allFilesByHash = new FilesByHash();
 			Process(dList);
 		}
 
@@ -45,30 +45,30 @@ namespace Data.Statistics
 		/// <param name="allFilesByHash"></param>
 		/// <param name="allFilesBySize"></param>
 		/// <param name="d"></param>
-        private static void GetStats(
-			FilesByHash allFilesByHash, 
-			FilesBySize allFilesBySize, 
+		private static void GetStats(
+			FilesByHash allFilesByHash,
+			FilesBySize allFilesBySize,
 			Directory d)
-        {
+		{
 			// depth first
-            foreach (var subDirectory in d.Directories)
-            {
-                GetStats(allFilesByHash, allFilesBySize, subDirectory);
-            }
+			foreach (var subDirectory in d.Directories)
+			{
+				GetStats(allFilesByHash, allFilesBySize, subDirectory);
+			}
 
-            foreach (var f in d.Files)
-            {
+			foreach (var f in d.Files)
+			{
 				// pigeonhole file by size
 				allFilesBySize.Add(f.Size, f);
-				
+
 				// skip if no hash exists for this file
 				// e. g. if it couldn't be scanned
 				if (f.MD5 == null) continue;
 
 				// pigeonhole file by hash
 				allFilesByHash.Add(f.MD5, f);
-            }
-        }
+			}
+		}
 
 		/// <summary>
 		/// Get a dictionary with files only if there are multiple files with that hash.
@@ -86,61 +86,67 @@ namespace Data.Statistics
 		}
 
 		[Serializable()]
-		public class FilesBySize : Dictionary<long, List<File>>
+		public class FilesBySize : Dovecot<long, File>
 		{
-			public FilesBySize() : base()
+			public FilesBySize()
+				: base()
 			{
 			}
 
-			public FilesBySize(SerializationInfo info, StreamingContext context) : base(info, context) 
+			public FilesBySize(SerializationInfo info, StreamingContext context)
+				: base(info, context)
 			{
-			}
-
-			public void Add(long key, File file)
-			{
-				Pigeonhole(this, key, file);
 			}
 		}
 
 		[Serializable()]
-		public class FilesByHash : Dictionary<string, List<File>>
+		public class FilesByHash : Dovecot<string, File>
 		{
-			public FilesByHash() : base()
+			public FilesByHash()
+				: base()
 			{
 			}
 
-			public FilesByHash(SerializationInfo info, StreamingContext context) : base(info, context) 
+			public FilesByHash(SerializationInfo info, StreamingContext context)
+				: base(info, context)
 			{
-			}
-
-			public void Add(string key, File file)
-			{
-				Pigeonhole(this, key, file);
 			}
 		}
 
-		/// <summary>
-		/// Stuff pigeons into the right hole of specified dovecot.
-		/// </summary>
-		/// <typeparam name="TDovecote"></typeparam>
-		/// <typeparam name="THole"></typeparam>
-		/// <param name="stats"></param>
-		/// <param name="hole"></param>
-		/// <param name="pigeon"></param>
-		private static void Pigeonhole<TDovecote, THole>(TDovecote stats, THole hole, File pigeon) where TDovecote : IDictionary<THole, List<File>>
+		[Serializable()]
+		public class Dovecot<THole, TPigeon> : Dictionary<THole, List<TPigeon>>
 		{
-			if (!stats.ContainsKey(hole))
+			public Dovecot()
+				: base()
 			{
-				var pigeons = new List<File>();
-				pigeons.Add(pigeon);
-				stats.Add(hole, pigeons);
 			}
-			else
+
+			public Dovecot(SerializationInfo info, StreamingContext context)
+				: base(info, context)
 			{
-				// skip files scanned more than once
-				if (!stats[hole].Contains(pigeon))
+			}
+
+			/// <summary>
+			/// See if there's a hole where the pigeon fits, if not, create one.
+			/// Then, check if the pigeon is already there. If not, add.
+			/// </summary>
+			/// <param name="hole"></param>
+			/// <param name="pigeon"></param>
+			public void Add(THole hole, TPigeon pigeon)
+			{
+				if (!this.ContainsKey(hole))
 				{
-					stats[hole].Add(pigeon);
+					var pigeons = new List<TPigeon>();
+					pigeons.Add(pigeon);
+					this.Add(hole, pigeons);
+				}
+				else
+				{
+					// skip files scanned more than once
+					if (!this[hole].Contains(pigeon))
+					{
+						this[hole].Add(pigeon);
+					}
 				}
 			}
 		}

@@ -8,8 +8,10 @@ namespace DuplicateDirectoryFinder
 {
 	public partial class Main : Form
 	{
+		/* my current state */
 		private Data.DirectoryList directoryList;
-		private Data.UseFileInfoDictionary useFileInfoDictionary; 
+		private string IOResultMessage;
+		private Data.UseFileInfoDictionary useFileInfoDictionary;
 
 		public Main()
 		{
@@ -122,7 +124,7 @@ namespace DuplicateDirectoryFinder
 		/* Loading timer */
 		private void LoadingTimer_Tick(object sender, EventArgs e)
 		{
-			if (directoryList == null)
+			if (directoryList == null && IOResultMessage == null)
 			{
 				progressScan.Style = ProgressBarStyle.Marquee;
 			}
@@ -130,7 +132,14 @@ namespace DuplicateDirectoryFinder
 			{
 				progressScan.Style = ProgressBarStyle.Continuous;
 				loadingTimer.Stop();
-				UI.UpdateTree(directoryList, treeView);
+				if (directoryList != null)
+				{
+					UI.UpdateTree(directoryList, treeView);
+				}
+				else
+				{
+					MessageBox.Show(IOResultMessage, "An error occurred while loading.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
 				UI.PlaySound();
 				this.UseWaitCursor = false;
 			}
@@ -186,14 +195,35 @@ namespace DuplicateDirectoryFinder
 		private void LoadLastScan()
 		{
 			// load directorylist object
-			if (System.IO.File.Exists(Data.IO.Path + "DirectoryList"))
+			var fileName = Data.IO.Path + Data.IO.DirectoryListFileName;
+			if (System.IO.File.Exists(fileName))
 			{
 				// the timer will reset the UI when loading is done
+				IOResultMessage = null;
+				directoryList = null;
 				loadingTimer.Start();
 				ThreadPool.QueueUserWorkItem(delegate
 				{
-					directoryList = Data.IO.LoadDirectoryList("DirectoryList");
+					var loadResult = Data.IO.LoadDirectoryList(Data.IO.DirectoryListFileName);
+					if (loadResult.Object != null)
+					{
+						IOResultMessage = null;
+						directoryList = loadResult.Object;
+					}
+					else if (loadResult.Message != null)
+					{
+						IOResultMessage = loadResult.Message;
+						directoryList = null;
+					} 
+					else
+					{
+						throw new Exception("Nothing was returned");
+					}
 				}, null);
+			}
+			else
+			{
+				MessageBox.Show(string.Format("File {0} does not exist.", fileName));
 			}
 		}
 
@@ -243,7 +273,7 @@ namespace DuplicateDirectoryFinder
 			// update UI, 
 			
 			// save results list
-			Data.IO.SaveDirectoryList(directoryList, "DirectoryList");
+			Data.IO.SaveDirectoryList(directoryList, Data.IO.DirectoryListFileName);
 
 			// save file hash dictionary
 			var uFid = new Data.UseFileInfoDictionary(directoryList);

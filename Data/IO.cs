@@ -2,8 +2,12 @@
 
 namespace Data
 {
+	using Statistics.Poco;
+
     public static class IO
     {
+		public readonly static string DirectoryListFileName = "DirectoryList";
+
 		public readonly static string Path = 
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
 				+ @"\DuplicateDirectoryFinder\";
@@ -36,22 +40,26 @@ namespace Data
 			}
 		}
 
-		public static DirectoryList LoadDirectoryList(string fileName)
+		public static IOResult<DirectoryList> LoadDirectoryList(string fileName)
 		{
 			var path = IO.Path + fileName;
+			var ioResult = new IOResult<DirectoryList>();
+
 			try
 			{
 				using (var str = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read))
 				{
 					var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-					return (DirectoryList)bf.Deserialize(str);
+					ioResult.Object = (DirectoryList)bf.Deserialize(str);
 				}
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("exception while loading from: " + path + "\n" + e.Message);
-				return null;
+				var message = "exception while loading from: " + path + "\n" + e.Message;
+				ioResult.Message = message;
 			}
+
+			return ioResult;
 		}
 
 		public static bool SaveFileInfoDictionary(FileInfoDictionary dic)
