@@ -10,10 +10,10 @@ namespace Data.Statistics
 	[Serializable()]
 	public class DuplicateFiles
     {
-        Dictionary<string, List<File>> allFilesByHash;
-		Dictionary<long, List<File>> allFilesBySize;
-		public Dictionary<string, List<File>> AllFilesByHash { get { return allFilesByHash; } }
-		public Dictionary<long, List<File>> AllFilesBySize { get { return allFilesBySize; } }
+		FilesBySize allFilesBySize;
+        FilesByHash allFilesByHash;
+		public FilesBySize AllFilesBySize { get { return allFilesBySize; } }
+		public FilesByHash AllFilesByHash { get { return allFilesByHash; } }
 
 		/// <summary>
 		/// This is the statistics object that produces dictionaries with duplicate files.
@@ -21,8 +21,8 @@ namespace Data.Statistics
 		/// <param name="dList">The object containing root directory/directories that were scanned.</param>
 		public DuplicateFiles(DirectoryList dList)
 		{
-			this.allFilesByHash = new Dictionary<string, List<File>>();
-			this.allFilesBySize = new Dictionary<long, List<File>>();
+			this.allFilesBySize = new FilesBySize(); //new Dictionary<long, List<File>>();
+			this.allFilesByHash = new FilesByHash(); //new Dictionary<string, List<File>>();
 			Process(dList);
 		}
 
@@ -34,7 +34,7 @@ namespace Data.Statistics
 		{
 			foreach (var directory in dList)
 			{
-				GetStats(ref allFilesByHash, ref allFilesBySize, directory);
+				GetStats(allFilesByHash, allFilesBySize, directory);
 			}
 		}
 
@@ -45,27 +45,27 @@ namespace Data.Statistics
 		/// <param name="allFilesBySize"></param>
 		/// <param name="d"></param>
         private static void GetStats(
-			ref Dictionary<string, List<File>> allFilesByHash, 
-			ref Dictionary<long, List<File>> allFilesBySize, 
+			FilesByHash allFilesByHash, 
+			FilesBySize allFilesBySize, 
 			Directory d)
         {
 			// depth first
             foreach (var subDirectory in d.Directories)
             {
-                GetStats(ref allFilesByHash, ref allFilesBySize, subDirectory);
+                GetStats(allFilesByHash, allFilesBySize, subDirectory);
             }
 
             foreach (var f in d.Files)
             {
 				// pigeonhole file by size
-				Pigeonhole(allFilesBySize, f.Size, f);
+				allFilesBySize.Add(f.Size, f);
 				
 				// skip if no hash exists for this file
-				// i. e. if it couldn't be scanned
+				// e. g. if it couldn't be scanned
 				if (f.MD5 == null) continue;
 
 				// pigeonhole file by hash
-				Pigeonhole(allFilesByHash, f.MD5, f);
+				allFilesByHash.Add(f.MD5, f);
             }
         }
 
@@ -81,6 +81,30 @@ namespace Data.Statistics
 					.ToDictionary(f => f.Key, f => f.Value);
 
 				return duplicates;
+			}
+		}
+
+		public class FilesBySize : Dictionary<long, List<File>>
+		{
+			public FilesBySize() : base()
+			{
+			}
+
+			public void Add(long key, File file)
+			{
+				Pigeonhole(this, key, file);
+			}
+		}
+
+		public class FilesByHash : Dictionary<string, List<File>>
+		{
+			public FilesByHash() : base()
+			{
+			}
+
+			public void Add(string key, File file)
+			{
+				Pigeonhole(this, key, file);
 			}
 		}
 
@@ -109,5 +133,5 @@ namespace Data.Statistics
 				}
 			}
 		}
-    }
+	}
 }
