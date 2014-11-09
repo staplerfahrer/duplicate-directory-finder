@@ -228,14 +228,14 @@ namespace DuplicateDirectoryFinder
 		/// </summary>
 		/// <param name="path1"></param>
 		/// <param name="path2"></param>
-		public static void AskComparePaths(string path1, string path2)
+		public static void AskExternalComparePaths(string path1, string path2)
 		{
 			if (MessageBox.Show(
 				string.Format("Compare directories\n{0}\nand\n{1}?", path1, path2),
 				"Compare directories?",
 				MessageBoxButtons.YesNo) == DialogResult.Yes)
 			{
-				ComparePaths(path1, path2);
+				ExternalComparePaths(path1, path2);
 			}
 		}
 
@@ -244,7 +244,7 @@ namespace DuplicateDirectoryFinder
 		/// </summary>
 		/// <param name="path1"></param>
 		/// <param name="path2"></param>
-		public static void ComparePaths(string path1, string path2) 
+		public static void ExternalComparePaths(string path1, string path2) 
 		{
 			var argument = string.Format("\"{0}\" \"{1}\"", path1, path2);
 			var treeComp = Properties.Settings.Default.TreeCompFullName;

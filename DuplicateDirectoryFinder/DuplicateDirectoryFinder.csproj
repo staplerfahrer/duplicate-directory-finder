@@ -87,6 +87,10 @@
       <Project>{b7e8d108-33e1-458c-98c1-29b79779a558}</Project>
       <Name>Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Extensions\Extensions.csproj">
+      <Project>{8dbd9e1d-be5a-41e0-85e9-a4051f59a3c0}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Ding.wav">

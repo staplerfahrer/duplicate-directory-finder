@@ -1,17 +1,82 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Windows.Forms;
-
-namespace DuplicateDirectoryFinder
+﻿namespace DuplicateDirectoryFinder
 {
+	using Extensions;
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Threading;
+	using System.Windows.Forms;
+
 	public partial class Main : Form
 	{
-		/* my current state */
+		/*
+		 * VIEW STATE STUFF 
+		 */
+		public enum UiState
+		{
+			Idle,
+			BusyScanning,
+			BusyTrimming,
+			BusyComparing
+		}
+		private UiState uiState;
+		public bool ToIdle()
+		{
+			if (CanGoIdle()) return SetState(UiState.Idle);
+			return false;
+		}
+		public bool ToBusyScanning()
+		{
+			if (CanGoBusyScanning()) return SetState(UiState.BusyScanning);
+			return false;
+		}
+		public bool ToBusyTrimming()
+		{
+			if (CanGoBusyTrimming()) return SetState(UiState.BusyTrimming);
+			return false;
+		}
+		public bool ToBusyComparing()
+		{
+			if (CanGoBusyComparing()) return SetState(UiState.BusyComparing);
+			return false;
+		}
+		public bool CanGoIdle()
+		{
+			return uiState != UiState.Idle;
+		}
+		public bool CanGoBusyScanning()
+		{
+			return uiState == UiState.Idle;
+		}
+		public bool CanGoBusyTrimming()
+		{
+			return uiState == UiState.Idle;
+		}
+		public bool CanGoBusyComparing()
+		{
+			return uiState == UiState.Idle;
+		}
+		private bool SetState(UiState newState)
+		{
+			switch (newState)
+			{
+				case UiState.Idle:
+					break;
+				case UiState.BusyScanning:
+					break;
+				case UiState.BusyTrimming:
+					break;
+				case UiState.BusyComparing:
+					break;
+				default:
+					return false;
+			}
+			return true;
+		}
+
 		private Data.DirectoryList directoryList;
-		private string IOResultMessage;
 		private Data.UseFileInfoDictionary useFileInfoDictionary;
+		private string IOResultMessage;
 
 		public Main()
 		{
@@ -32,12 +97,10 @@ namespace DuplicateDirectoryFinder
 
 		private void ButtonPickDirectory_Click(object sender, EventArgs e)
 		{
-			if (DirectoryPicker.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+			if (directoryPicker.ShowDialog() == System.Windows.Forms.DialogResult.OK
+				&& System.IO.Directory.Exists(directoryPicker.SelectedPath))
 			{
-				if (System.IO.Directory.Exists(DirectoryPicker.SelectedPath))
-				{
-					textBoxScanDirectory.Text = DirectoryPicker.SelectedPath;
-				}
+				textBoxScanDirectory.Text = textBoxScanDirectory.Text.JoinWith("|", directoryPicker.SelectedPath);
 			}
 		}
 
@@ -46,7 +109,7 @@ namespace DuplicateDirectoryFinder
 			buttonStartScan.Enabled = false;
 
 			var paths = textBoxScanDirectory.Text.Split('|');
-			var skipSize = (long)NumericUpDownSkipSize.Value;
+			var skipSize = (long)numericUpDownSkipSize.Value;
 
 			// start scanning background thread
 			StartScanning(paths, skipSize);
@@ -117,7 +180,7 @@ namespace DuplicateDirectoryFinder
 			{
 				var path1 = (string)checkedBoxes[0].Tag;
 				var path2 = (string)checkedBoxes[1].Tag;
-				UI.AskComparePaths(path1, path2);
+				UI.AskExternalComparePaths(path1, path2);
 			}
 		}
 
@@ -159,12 +222,12 @@ namespace DuplicateDirectoryFinder
 			}
 			if (directoryList != null)
 			{
-				LabelFilesDirs.Text = directoryList.ScanInfo.FileScanCount.ToString("#,##0") + " files\n"
+				labelFilesDirs.Text = directoryList.ScanInfo.FileScanCount.ToString("#,##0") + " files\n"
 					+ directoryList.ScanInfo.DirectoryCount.ToString("#,##0") + " dirs \n"
 					+ stopWatch.Elapsed.ToString("hh\\:mm\\:ss") + " time ";
 
-				LabelLast10Files.Text = string.Join("\n", directoryList.ScanInfo.Last10Files);
-				LabelLast10Directories.Text = string.Join("\n", directoryList.ScanInfo.Last10Directories);
+				labelLast10Files.Text = string.Join("\n", directoryList.ScanInfo.Last10Files);
+				labelLast10Directories.Text = string.Join("\n", directoryList.ScanInfo.Last10Directories);
 
 				if (directoryList.ScanInfo.DoneScanning)
 				{
@@ -188,7 +251,7 @@ namespace DuplicateDirectoryFinder
 			}
 			else
 			{
-				LabelFilesDirs.Text = "- files\n- dirs \n- hh:mm:ss";
+				labelFilesDirs.Text = "- files\n- dirs \n- hh:mm:ss";
 			}
 		}
 
@@ -315,11 +378,6 @@ namespace DuplicateDirectoryFinder
 
 		private void buttonTrimTree_Click(object sender, EventArgs e)
 		{
-			// old tree trimming routine
-			//var trimmedNodes = UI.TrimDuplicateFileTreeNodes(treeView.Nodes);
-			//treeView.Nodes.Clear();
-			//treeView.Nodes.AddRange(trimmedNodes);
-
 			// now trims non-duplicates
 			UI.UpdateTree(directoryList, treeView);
 		}
