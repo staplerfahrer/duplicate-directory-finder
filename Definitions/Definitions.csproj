@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8DBD9E1D-BE5A-41E0-85E9-A4051F59A3C0}</ProjectGuid>
+    <ProjectGuid>{972CA582-2CFD-41AA-A612-8DD5735341BE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DDFinder.Extensions</RootNamespace>
-    <AssemblyName>DDFinder.Extensions</AssemblyName>
+    <RootNamespace>DDFinder.Business.Definitions</RootNamespace>
+    <AssemblyName>DDFinder.Business.Definitions</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StringExtensions.cs" />
+    <Compile Include="FileSizeRanges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

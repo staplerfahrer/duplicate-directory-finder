@@ -1,14 +1,22 @@
-﻿namespace DuplicateDirectoryFinder
+﻿namespace DDFinder.UI
 {
+	using Business;
 	using Extensions;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Threading;
+	using System.Threading.Tasks;
 	using System.Windows.Forms;
 
 	public partial class Main : Form
 	{
+		private UiState uiState;
+
+		private Services.DuplicateScanner.DirectoryList directoryList;
+		private Services.DuplicateScanner.UseFileInfoDictionary useFileInfoDictionary;
+		private string IOResultMessage;
+
 		/*
 		 * VIEW STATE STUFF 
 		 */
@@ -19,7 +27,6 @@
 			BusyTrimming,
 			BusyComparing
 		}
-		private UiState uiState;
 		public bool ToIdle()
 		{
 			if (CanGoIdle()) return SetState(UiState.Idle);
@@ -74,25 +81,21 @@
 			return true;
 		}
 
-		private Data.DirectoryList directoryList;
-		private Data.UseFileInfoDictionary useFileInfoDictionary;
-		private string IOResultMessage;
-
 		public Main()
 		{
 			InitializeComponent();
 
 			// get drive letters
-			textBoxScanDirectory.Text = string.Join("|", Data.Drive.GetDrives());
+			textBoxScanDirectory.Text = string.Join("|", Services.DuplicateScanner.Drive.GetDrives());
 		}
 
 		/* Top panel */
-		private void ButtonLoadLastScan_Click(object sender, EventArgs e)
+		private async void ButtonLoadLastScan_Click(object sender, EventArgs e)
 		{
 			((Button)sender).Enabled = false;
 			this.UseWaitCursor = true;
 
-			LoadLastScan();
+			await LoadLastScanAsync();
 		}
 
 		private void ButtonPickDirectory_Click(object sender, EventArgs e)
@@ -120,9 +123,9 @@
 			this.UseWaitCursor = true;
 			((Button)sender).Enabled = false;
 			((Button)sender).Update();
-			useFileInfoDictionary = new Data.UseFileInfoDictionary(true);
+			useFileInfoDictionary = new Services.DuplicateScanner.UseFileInfoDictionary(true);
 			this.UseWaitCursor = false;
-			UI.PlaySound();
+			Helpers.PlaySound();
 		}
 
 		/* right panel: directory view button event */
@@ -131,7 +134,7 @@
 			if (sender.GetType() == typeof(Button))
 			{
 				var senderObj = (Button)sender;
-				var fullName = ((Data.File)senderObj.Tag).FullName;
+				var fullName = ((Services.DuplicateScanner.File)senderObj.Tag).FullName;
 				if (!System.IO.File.Exists(fullName))
 				{
 					return;
@@ -180,7 +183,7 @@
 			{
 				var path1 = (string)checkedBoxes[0].Tag;
 				var path2 = (string)checkedBoxes[1].Tag;
-				UI.AskExternalComparePaths(path1, path2);
+				UI.Helpers.AskExternalComparePaths(path1, path2);
 			}
 		}
 
@@ -197,13 +200,13 @@
 				loadingTimer.Stop();
 				if (directoryList != null)
 				{
-					UI.UpdateTree(directoryList, treeView);
+					UI.Helpers.UpdateTree(directoryList, treeView);
 				}
 				else
 				{
 					MessageBox.Show(IOResultMessage, "An error occurred while loading.", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
-				UI.PlaySound();
+				UI.Helpers.PlaySound();
 				this.UseWaitCursor = false;
 			}
 		}
@@ -255,39 +258,36 @@
 			}
 		}
 
-		private void LoadLastScan()
+		/// <summary>
+		/// Load the serialized DirectoryList containing the saved data from the last scan.
+		/// </summary>
+		private async Task LoadLastScanAsync()
 		{
 			// load directorylist object
-			var fileName = Data.IO.Path + Data.IO.DirectoryListFileName;
-			if (System.IO.File.Exists(fileName))
+			if (!System.IO.File.Exists(Services.IO.Storage.DirectoryListFullPath))
 			{
-				// the timer will reset the UI when loading is done
+				MessageBox.Show(string.Format(
+						"The previous scan results could not be loaded from {0}.",
+						Services.IO.Storage.DirectoryListFullPath));
+				return;
+			}
+
+			// the timer will reset the UI when loading is done
+			IOResultMessage = null;
+			directoryList = null;
+			loadingTimer.Start();
+
+			var taskResult = await Services.IO.Storage.LoadDirectoryListAsync<Services.DuplicateScanner.DirectoryList>();
+			if (taskResult.Object != null)
+			{
 				IOResultMessage = null;
-				directoryList = null;
-				loadingTimer.Start();
-				ThreadPool.QueueUserWorkItem(delegate
-				{
-					var loadResult = Data.IO.LoadDirectoryList(Data.IO.DirectoryListFileName);
-					if (loadResult.Object != null)
-					{
-						IOResultMessage = null;
-						directoryList = loadResult.Object;
-					}
-					else if (loadResult.Message != null)
-					{
-						IOResultMessage = loadResult.Message;
-						directoryList = null;
-					} 
-					else
-					{
-						throw new Exception("Nothing was returned");
-					}
-				}, null);
+				directoryList = taskResult.Object;
 			}
-			else
+			else if (taskResult.Message != null)
 			{
-				MessageBox.Show(string.Format("File {0} does not exist.", fileName));
-			}
+				IOResultMessage = taskResult.Message;
+				directoryList = null;
+			} 
 		}
 
 		private void StartScanning(string[] paths, long skipSize)
@@ -305,17 +305,17 @@
 
 			ThreadPool.QueueUserWorkItem(delegate
 			{
-				directoryList = new Data.DirectoryList();
+				directoryList = new Services.DuplicateScanner.DirectoryList();
 				directoryList.ScanInfo.Reset();
 				foreach (var path in paths)
 				{
-					var newD = new Data.Directory(fullPath: path);
+					var newD = new Services.DuplicateScanner.Directory(fullPath: path);
 					directoryList.Add(newD);
 				}
 				directoryList.Scan(skipSize);
 
 				directoryList.ScanInfo.DoneScanning = true;
-				directoryList.ScanInfo.DuplicateFiles = new Data.Statistics.DuplicateFiles(directoryList);
+				directoryList.ScanInfo.DuplicateFiles = new Services.DuplicateScanner.Statistics.DuplicateFiles(directoryList);
 
 				directoryList.Hash(useFileInfoDictionary);
 
@@ -336,10 +336,10 @@
 			// update UI, 
 			
 			// save results list
-			Data.IO.SaveDirectoryList(directoryList, Data.IO.DirectoryListFileName);
+			Services.IO.Storage.SaveDirectoryList(directoryList);
 
 			// save file hash dictionary
-			var uFid = new Data.UseFileInfoDictionary(directoryList);
+			var uFid = new Services.DuplicateScanner.UseFileInfoDictionary(directoryList);
 			uFid.Save();
 			useFileInfoDictionary = uFid;
 
@@ -347,8 +347,8 @@
 			uiUpdateTimer.Stop();
 			progressScan.Value = 0;
 			buttonStartScan.Enabled = true;
-			UI.UpdateTree(directoryList, treeView);
-			UI.PlaySound();
+			UI.Helpers.UpdateTree(directoryList, treeView);
+			UI.Helpers.PlaySound();
 		}
 
 		private void TreeViewDuplicates_AfterSelect(object sender, TreeViewEventArgs e)
@@ -356,7 +356,7 @@
 			if (e.Node.Tag != null)
 			{
 				splitContainerMain.Panel2.Controls.Clear();
-				var explorerControls = UI.GetExplorerControls(this, splitContainerMain.Panel2, directoryList, (string)e.Node.Tag);
+				var explorerControls = UI.Helpers.GetExplorerControls(this, splitContainerMain.Panel2, directoryList, (string)e.Node.Tag);
 				splitContainerMain.Panel2.Controls.AddRange(explorerControls);
 			}
 		}
@@ -379,7 +379,7 @@
 		private void buttonTrimTree_Click(object sender, EventArgs e)
 		{
 			// now trims non-duplicates
-			UI.UpdateTree(directoryList, treeView);
+			UI.Helpers.UpdateTree(directoryList, treeView);
 		}
 	}
 }

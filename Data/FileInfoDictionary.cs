@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-
-namespace Data
+﻿namespace DDFinder.Services.DuplicateScanner
 {
+	using DDFinder.Services.IO;
+
+	using System;
+	using System.Collections.Generic;
+	using System.Runtime.Serialization;
+
 	public class UseFileInfoDictionary
 	{
 		public FileInfoDictionary Dic { get; set; }
@@ -17,14 +19,14 @@ namespace Data
 		{
 			if (loadFromDisk)
 			{
-				Dic = IO.LoadFileInfoDictionary();
+				Dic = Storage.LoadFileInfoDictionary<FileInfoDictionary>();
 				if (Dic == null) throw new Exception("File info dictionary did not load.");
 			}
 		}
 
 		public UseFileInfoDictionary(DirectoryList directoryList)
 		{
-			Dic = new Data.FileInfoDictionary();
+			Dic = new DDFinder.Services.DuplicateScanner.FileInfoDictionary();
 			Dic.Created = DateTime.Now;
 			foreach (var hash in directoryList.ScanInfo.DuplicateFiles.AllFilesByHash)
 			{
@@ -55,7 +57,7 @@ namespace Data
 
 		public bool Save()
 		{
-			return Data.IO.SaveFileInfoDictionary(Dic);
+			return Storage.SaveFileInfoDictionary<FileInfoDictionary>(Dic);
 		}
 
 		public bool HasFile(string fullName)
@@ -78,7 +80,7 @@ namespace Data
 	/// File info stored by full name
 	/// </summary>
 	[Serializable()]
-	public class FileInfoDictionary : Dictionary<string, Data.File>
+	public class FileInfoDictionary : Dictionary<string, DDFinder.Services.DuplicateScanner.File>
 	{
 		public FileInfoDictionary()
 			: base()

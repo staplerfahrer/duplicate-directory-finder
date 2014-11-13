@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DDFinder.Services.DuplicateScanner")]
+[assembly: AssemblyTitle("IO")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DDFinder.Services.DuplicateScanner")]
+[assembly: AssemblyProduct("IO")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c2419afd-1c46-4e67-8068-05b001a84843")]
+[assembly: Guid("51727349-8bd8-4e52-8549-c1410b838a60")]
 
 // Version information for an assembly consists of the following four values:
 //

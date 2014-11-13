@@ -1,4 +1,4 @@
-﻿namespace DuplicateDirectoryFinder
+﻿namespace DDFinder.UI
 {
     partial class Main
     {
@@ -269,6 +269,7 @@
 			this.buttonPickDirectory.Size = new System.Drawing.Size(146, 23);
 			this.buttonPickDirectory.TabIndex = 0;
 			this.buttonPickDirectory.Text = "Pick Directory to Scan";
+			this.toolTipSizeHelp.SetToolTip(this.buttonPickDirectory, "Add more directories to scan");
 			this.buttonPickDirectory.UseVisualStyleBackColor = true;
 			this.buttonPickDirectory.Click += new System.EventHandler(this.ButtonPickDirectory_Click);
 			// 

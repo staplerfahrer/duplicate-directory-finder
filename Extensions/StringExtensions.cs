@@ -1,4 +1,4 @@
-﻿namespace Extensions
+﻿namespace DDFinder.Extensions
 {
 	public static class StringExtensions
     {

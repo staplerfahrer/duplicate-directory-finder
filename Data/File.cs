@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace Data
+namespace DDFinder.Services.DuplicateScanner
 {
 	/// <summary>
 	/// The object containing all relevant information about a file.

@@ -1,4 +1,4 @@
-﻿namespace Data.Statistics.Poco
+﻿namespace DDFinder.Business.Definitions
 {
 	public static class FileSizeRanges
 	{

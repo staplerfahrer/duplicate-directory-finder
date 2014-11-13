@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Data
+namespace DDFinder.Services.DuplicateScanner
 {
 	public static class Drive
 	{

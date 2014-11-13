@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Data.Statistics
+﻿namespace DDFinder.Services.DuplicateScanner.Statistics
 {
+	using System;
+	using System.Collections.Generic;
+
 	[Serializable()]
 	public class ScanInfo
 	{

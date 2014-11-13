@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-
-namespace DuplicateDirectoryFinder
+﻿namespace DDFinder.UI
 {
-	public static class UI
+	using Services.DuplicateScanner;
+
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Linq;
+	using System.Windows.Forms;
+
+	public static class Helpers
 	{
-		public static Control[] GetExplorerControls(Main form, Control container, Data.DirectoryList directoryList, string fileHash)
+		public static Control[] GetExplorerControls(Main form, Control container, DirectoryList directoryList, string fileHash)
 		{
 			// room for buttons and controls
 			var boxTopMargin = 23;
@@ -24,10 +25,10 @@ namespace DuplicateDirectoryFinder
 			// for each file duplicate,
 			// create a listbox with buttons
 			var fileIndex = 0;
-			foreach (Data.File f in duplicateFiles)
+			foreach (File f in duplicateFiles)
 			{
 				var newBox = new ListBox();
-				newBox.Name = "explorerControl-" + Data.IO.MakeSafe(f.Path);
+				newBox.Name = "explorerControl-" + Services.IO.Helpers.MakeSafe(f.Path);
 				newBox.BorderStyle = BorderStyle.None;
 				newBox.Width = container.Width;
 				newBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -92,7 +93,7 @@ namespace DuplicateDirectoryFinder
 			return explorerControls.ToArray();
 		}
 
-		public static TreeNode[] GetTreeNodes(Data.DirectoryList directoryList)
+		public static TreeNode[] GetTreeNodes(DirectoryList directoryList)
 		{
 			var dupFiles = directoryList.ScanInfo.DuplicateFiles.GetDuplicatesByHash
 				.OrderByDescending(f => 
@@ -101,7 +102,7 @@ namespace DuplicateDirectoryFinder
 
 			var rootNodes = new List<TreeNode>();
 			var rangeIdx = 0;
-			foreach (var range in Data.Statistics.Poco.FileSizeRanges.Ranges)
+			foreach (var range in Business.Definitions.FileSizeRanges.Ranges)
 			{
 				// each file size range
 				var wastedSpaceThisRange = 0L;
@@ -157,7 +158,7 @@ namespace DuplicateDirectoryFinder
 
 					var nodeLabel = string.Format("{0} wasted, files of 1 {1}+ ({2}×)", 
 						wastedSpaceLabel, 
-						Data.Statistics.Poco.FileSizeRanges.Labels[rangeIdx], 
+						Business.Definitions.FileSizeRanges.Labels[rangeIdx], 
 						hashNodes.Count.ToString("#,##0.0"));
 
 					var rangeNode = new TreeNode(nodeLabel);
@@ -216,7 +217,7 @@ namespace DuplicateDirectoryFinder
 		/// </summary>
 		/// <param name="directoryList"></param>
 		/// <param name="treeView"></param>
-		public static void UpdateTree(Data.DirectoryList directoryList, TreeView tree)
+		public static void UpdateTree(DirectoryList directoryList, TreeView tree)
 		{
 			var rootNodes = GetTreeNodes(directoryList);
 			tree.Nodes.Clear();
@@ -249,7 +250,7 @@ namespace DuplicateDirectoryFinder
 			var argument = string.Format("\"{0}\" \"{1}\"", path1, path2);
 			var treeComp = Properties.Settings.Default.TreeCompFullName;
 
-			if (File.Exists(treeComp))
+			if (System.IO.File.Exists(treeComp))
 			{
 				Process.Start(treeComp, argument);
 			}
@@ -257,7 +258,7 @@ namespace DuplicateDirectoryFinder
 
 		public static void PlaySound()
 		{
-			var assemblyInfo = new System.IO.FileInfo(System.Reflection.Assembly.GetAssembly(typeof(UI)).Location);
+			var assemblyInfo = new System.IO.FileInfo(System.Reflection.Assembly.GetAssembly(typeof(Helpers)).Location);
 
 			new System.Media.SoundPlayer(assemblyInfo.DirectoryName + "\\Ding.wav").Play();
 		}

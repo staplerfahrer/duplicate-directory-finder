@@ -3,13 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2013 for Windows Desktop
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuplicateDirectoryFinder", "DuplicateDirectoryFinder\DuplicateDirectoryFinder.csproj", "{FA097F68-5EC5-4E13-84E9-132D2F13CEC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "DuplicateDirectoryFinder\UI.csproj", "{FA097F68-5EC5-4E13-84E9-132D2F13CEC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{B7E8D108-33E1-458C-98C1-29B79779A558}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuplicateScanner", "Data\DuplicateScanner.csproj", "{B7E8D108-33E1-458C-98C1-29B79779A558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Tests", "Data.Tests\Data.Tests.csproj", "{93C9D55B-5B95-4087-B70C-B3118044AB37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuplicateScanner", "Data.Tests\DuplicateScanner.csproj", "{93C9D55B-5B95-4087-B70C-B3118044AB37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions\Extensions.csproj", "{8DBD9E1D-BE5A-41E0-85E9-A4051F59A3C0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{0D1F3D62-5C7C-4BB0-89F7-E55A67C61253}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{7238D8C2-64C9-450D-A48F-736D68B8943F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Tests", "Services.Tests", "{D4F0836C-F0D3-4AF2-AA2F-E092290861BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{9AA7BF66-40F1-4D18-A273-11B51BD602F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Definitions", "Definitions\Definitions.csproj", "{972CA582-2CFD-41AA-A612-8DD5735341BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IO", "IO\IO.csproj", "{0D1A51CA-50CC-4565-ACA2-1E4C482D635C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +45,26 @@ Global
 		{8DBD9E1D-BE5A-41E0-85E9-A4051F59A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DBD9E1D-BE5A-41E0-85E9-A4051F59A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DBD9E1D-BE5A-41E0-85E9-A4051F59A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7238D8C2-64C9-450D-A48F-736D68B8943F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7238D8C2-64C9-450D-A48F-736D68B8943F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7238D8C2-64C9-450D-A48F-736D68B8943F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7238D8C2-64C9-450D-A48F-736D68B8943F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{972CA582-2CFD-41AA-A612-8DD5735341BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{972CA582-2CFD-41AA-A612-8DD5735341BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{972CA582-2CFD-41AA-A612-8DD5735341BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{972CA582-2CFD-41AA-A612-8DD5735341BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D1A51CA-50CC-4565-ACA2-1E4C482D635C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D1A51CA-50CC-4565-ACA2-1E4C482D635C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D1A51CA-50CC-4565-ACA2-1E4C482D635C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D1A51CA-50CC-4565-ACA2-1E4C482D635C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B7E8D108-33E1-458C-98C1-29B79779A558} = {0D1F3D62-5C7C-4BB0-89F7-E55A67C61253}
+		{93C9D55B-5B95-4087-B70C-B3118044AB37} = {D4F0836C-F0D3-4AF2-AA2F-E092290861BE}
+		{972CA582-2CFD-41AA-A612-8DD5735341BE} = {9AA7BF66-40F1-4D18-A273-11B51BD602F5}
+		{0D1A51CA-50CC-4565-ACA2-1E4C482D635C} = {0D1F3D62-5C7C-4BB0-89F7-E55A67C61253}
 	EndGlobalSection
 EndGlobal

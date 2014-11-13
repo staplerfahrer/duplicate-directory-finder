@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-
-namespace Data.Statistics
+﻿namespace DDFinder.Services.DuplicateScanner.Statistics
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Runtime.Serialization;
+
 	/// <summary>
 	/// Produces statistics about the duplicates found in the scan results
 	/// </summary>
